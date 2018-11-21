@@ -3,20 +3,16 @@ title: "Reproducible Research Course Project 1"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
 
-```{r loading packages,include = FALSE, results = "hide"}
-library(ggplot2)
-library(dplyr)
-```
+
+
 
 
 ## Loading and preprocessing the data
 
 
-```{r load}
+
+```r
 data <- read.csv("activity.csv")
 data$date <- as.Date(data$date, "%Y-%m-%d")
 data$day <- weekdays(as.Date(data$date))
@@ -28,7 +24,8 @@ data$day <- weekdays(as.Date(data$date))
 2. Make a histogram of the total number of steps taken each day
 3. Calculate and report the mean and median of the total number of steps taken per day
 
-```{r Q1}
+
+```r
 data_NA <- data[complete.cases(data$steps),]
 
 dataQ1 <- data_NA %>%
@@ -39,10 +36,24 @@ dataQ1 %>% ggplot(aes(x=step)) +
     geom_histogram(binwidth = 2500) +
     xlab("Steps") +
     ylab("Frequency") 
+```
 
+![plot of chunk Q1](figure/Q1-1.png)
+
+```r
 mean(dataQ1$step)
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 median(dataQ1$step)
+```
+
+```
+## [1] 10765
 ```
 
 ##What is the average daily activity pattern?
@@ -50,7 +61,8 @@ median(dataQ1$step)
 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r Q2}
+
+```r
 dataQ2 <- data_NA %>%
     group_by(interval) %>%
     summarize(step = mean(steps))
@@ -58,9 +70,17 @@ dataQ2 <- data_NA %>%
 dataQ2 %>% ggplot(aes(x=interval,y=step)) + geom_line() +
     xlab("Interval") +
     ylab("Steps")
+```
 
+![plot of chunk Q2](figure/Q2-1.png)
+
+```r
 max_val <- max(dataQ2$step)
 dataQ2[dataQ2$step==max_val,1,1]
+```
+
+```
+## [1] 835
 ```
 
 ##Imputing missing values
@@ -73,9 +93,16 @@ I will use the weekday average from the data without missing values
 
 The values do differ from the estimates from the first part. Some of the middle histogram bars are a bit higher than they were in the first part
 
-```{r Q3}
-nrow(data) - sum(complete.cases(data$steps))
 
+```r
+nrow(data) - sum(complete.cases(data$steps))
+```
+
+```
+## [1] 2304
+```
+
+```r
 data_day <- data_NA %>%
     group_by(day) %>%
     summarise(step = mean(steps))
@@ -95,9 +122,24 @@ dataQ3 %>% ggplot() +
     xlab("Steps") +
     ylab("Frequency") +
     scale_color_manual(labels = c("steps_NA_rm","steps_with_imputed_data"), values = c("red", "blue"))
+```
 
+![plot of chunk Q3](figure/Q3-1.png)
+
+```r
 mean(dataQ3$step)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(dataQ3$step)
+```
+
+```
+## [1] 10395
 ```
 
 ##Are there differences in activity patterns between weekdays and weekends?
@@ -105,7 +147,8 @@ median(dataQ3$step)
 1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 2. Make a panel plot containing a time series plot (i.e. type="l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
-```{r Q4}
+
+```r
 data4 <- data_impute
 data4$new_factor <- ifelse(data4$day %in% c("Saturday","Sunday"),"weekend","weekday")
 data4$new_factor <- as.factor(data4$new_factor)
@@ -118,5 +161,6 @@ dataQ4 %>% ggplot(aes(x=interval,y=step)) + geom_line() +
     xlab("Interval") +
     ylab("Steps") + 
     facet_grid(rows = vars(new_factor))
-
 ```
+
+![plot of chunk Q4](figure/Q4-1.png)
